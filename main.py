@@ -8,25 +8,14 @@ from util.util_images import *
 import cv2
 import os
 import modelo
+#import schedule
+import asyncio
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-model = modelo.cargar_modelo()
-model_adi = modelo.cargar_modelo_adi()
-
-class Registrar_usuario(BaseModel):
-    name: str
-    olds: str
-    password : str
-    confi_password: str
-
-class Login_usuario(BaseModel):
-    name: str
-    password: str
-
-class validar_img(BaseModel):
-    img: UploadFile = File(...)
+#model = modelo.cargar_modelo()
+model = modelo.cargar_modelo_adi()
 
 app.add_middleware(
     
@@ -37,20 +26,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
-async def root(response: Response = Response()):
-    return {"message": "403 Forbidden"}
-
-@app.post("/registrar-usuario")
-async def registrar_usuario(data: Registrar_usuario):
-    return {"message": "403 Forbidden"}
-
-@app.post("/iniciar-sesion")
-async def login_usuario(data: Login_usuario):
-    print('========================')
-    if data.name == data.password:return True
-    return False
-
 @app.post("/recibir-imagen")
 async def login_usuario(image: UploadFile):
     
@@ -58,10 +33,9 @@ async def login_usuario(image: UploadFile):
     with open(image.filename, "wb") as file:
         file.write(image.file.read())
     img = cv2.imread(image.filename)
-    
+
     dict_clases = modelo.peticiones(img, model)
     print('dict clases:::',dict_clases)
-    
     img = marcar_regiones(img,dict_clases)
     ruta = f'static/{image.filename}'
     
@@ -70,6 +44,17 @@ async def login_usuario(image: UploadFile):
     print(FileResponse(ruta))
     return image.filename
 
+#schedule.every(2).seconds.do(hola_mundo)
+#schedule.run_pending()
 
+async def my_background_task():
+    while True:
+        print("Ejecutando tarea cada 10 segundos...")
+        clean_static_folder()
+        # Tu lógica aquí
+        # Pausa de 5 segundos
+        await asyncio.sleep(300)
 
-
+@app.on_event("startup")
+async def startup_event():
+    asyncio.create_task(my_background_task())

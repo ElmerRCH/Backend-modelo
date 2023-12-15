@@ -15,7 +15,7 @@ def peticiones(img, modelo):
     results = None
     img_org = img
     img = aplicar_tratamiento(img)
-
+    
     results = modelo(img) # PyTorch 2.0.1
 
     df_results = results.pandas().xyxy[0]

@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
-import torch
-import pandas as pd
+import os
+import glob
 
 def recorte_centro_manual(image):
     ancho = image.shape[1]
@@ -64,12 +64,33 @@ def obten_puntos_rectangulo(clase, dict_clases):
         y1 = round(dict_clases[clase][0][1])
         x2 = round(dict_clases[clase][0][2])
         y2 = round(dict_clases[clase][0][3])
-
+    
     return x1, y1, x2, y2
 
 def marcar_regiones(img,dict_clases):
 
     for i in dict_clases:
         x1, y1, x2, y2 = obten_puntos_rectangulo(i, dict_clases)
-        cv2.rectangle(img, (x1, y1), (x2, y2), 255,4,3 ,2)  
+        cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 3)
+        print('x1, y1, x2, y2',x1, y1, x2, y2)
     return img
+
+
+def clean_static_folder():
+    print('Borrando.......')
+    static_folder = 'static'
+    image_extensions = ['jpg', 'png', 'jpeg']
+
+    files_to_delete = []
+    for ext in image_extensions:
+        files_to_delete.extend(glob.glob(os.path.join(static_folder, f'*.{ext}')))
+
+    for file_path in files_to_delete:
+        try:
+            os.remove(file_path)
+            print(f'Archivo eliminado: {file_path}')
+        except Exception as e:
+            print(f'Error al eliminar archivo {file_path}: {e}')
+
+def hola_mundo():
+    print('ola..........')
