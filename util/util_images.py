@@ -58,7 +58,7 @@ def aplicar_tratamiento(img, re_size=(640, 640)):
 
 def obten_puntos_rectangulo(clase, dict_clases):
     x1, y1, x2, y2 = 0, 0, 0, 0
-
+    
     if clase in dict_clases:
         x1 = round(dict_clases[clase][0][0])
         y1 = round(dict_clases[clase][0][1])
